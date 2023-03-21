@@ -1,3 +1,4 @@
+### Credit
 Based on https://github.com/ChandlerSwift/asteroid-authenticator.
 Uses Rhys Weatherley's arduinolibs Crypto library and 
 https://github.com/Tarsnap/scrypt source code.
