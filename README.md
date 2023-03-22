@@ -20,8 +20,7 @@ Clock can be set using a synchronization client see https://asteroidos.org/wiki/
 
 ### Use
 App support encryption  using AES256. Supports adding and removing entries. 
-
-
+For more read wiki.
 
 ### Building
 ```
