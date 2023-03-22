@@ -18,6 +18,11 @@ Proper time set (including the time zone)
 
 Clock can be set using a synchronization client see https://asteroidos.org/wiki/synchronization-clients/.
 
+### Use
+App support encryption  using AES256. Supports adding and removing entries. 
+
+
+
 ### Building
 ```
 mkdir build
