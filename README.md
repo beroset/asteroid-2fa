@@ -6,7 +6,7 @@ https://github.com/Tarsnap/scrypt source code.
 # Asteroid Authenticator
 A Two-Factor auth app for [AsteroidOS](http://asteroidos.org/)
 
-### Requirements
+### Requirements 
 Proper time set (including the time zone)
 > R1: The prover (e.g., token, soft token) and verifier (authentication
 > or validation server) MUST know or be able to derive the current
@@ -16,13 +16,7 @@ Proper time set (including the time zone)
 > precision of the time used by the prover affects how often the
 > clock synchronization should be done; see Section 6.
 
-You may want `ntp` to keep your clock synced. At one point, AsteroidOS shipped
-with an ntp client configured, but it looks like that is no longer the case.
-AsteroidOS doesn't seem to have an NTP client in its repos either (as of
-2021-04-08), but I've built it; you can get it from the repos at
-https://home.chandlerswift.com/asteroid/ -- just update
-`/etc/opkg/base-feeds.conf` to point at my repos, `opkg update`, and
-`opkg install ntp`.
+Clock can be set using a synchronization client see https://asteroidos.org/wiki/synchronization-clients/.
 
 ### Building
 ```
