@@ -1,17 +1,12 @@
 {
-"db" : [{"issuer":"Microsoft","secret":"TFGNMAFYHCKPZDRU"},
+"db":[{"issuer":"Microsoft","secret":"TFGNMAFYHCKPZDRU"},
 		{"issuer":"Facebook","secret":"GSLWDOBVHKEXVKNM"},
 		{"issuer":"Github","secret":"JHUDADUNMAEZCSTS"},
 		{"issuer":"Google","secret":"QKQMNPSEXFROTGCT"}
 		],
-
-
-
 "key" : {
 		"tag":"",
 		"salt":"",
 		"nonce":""
 		}
-
-		
 }

@@ -54,14 +54,22 @@ Application {
 	   	var x = 0;
 		for (var j = 0; j < len; ++j) {
 			var tmp = list[j].split(":");
-			database.push({"issuer":tmp[0], "secret":tmp[1]})  			
+			database.push({"issuer":tmp[0],
+								"secret":tmp[1],
+								"algo":tmp[2],
+								"digit":parseInt(tmp[3]),
+								"period":parseInt(tmp[4])});		
 		}   	
 		datasize = database.length
 	}
  	
- 	function addData(issuer, secret) {
+ 	function addData(issuer, secret, algo, digit, period) {
  		if (issuer != "" && secret != ""){
-			database.push({"issuer": issuer, "secret": secret}) 			
+			database.push({"issuer": issuer, 
+								"secret": secret,
+								"algo": algo,
+								"digit": digit,
+								"period":period}) 			
  			datasize = database.length
  		}
  	}
@@ -77,12 +85,15 @@ Application {
  		db = "";
  		for (var j=0;j<datasize;++j){
 			db += database[j].issuer + ":";
-			db += database[j].secret + ";";		
+			db += database[j].secret + ":";
+			db += database[j].algo + ":";
+			db += database[j].digit + ":";
+			db += database[j].period + ";";		
  		}
  	}
  	
  	LayerStack {
-   		id: layerStack
+   	id: layerStack
 		firstPage: passwordPage
 
 	}
@@ -92,18 +103,16 @@ Application {
 		id:passwordPage
 		Item{
 		id:rootM
-		TextField {
-			id: passwordField
-			width: Dims.w(80)
-			anchors.verticalCenter : parent.verticalCenter
-			anchors.horizontalCenter: parent.horizontalCenter
-			echoMode:TextInput.Password
-			inputMethodHints:Qt.ImhSensitiveData
-			previewText: qsTrId("Password")	
-				
-			
-		}
 		
+		TextBox {
+			id: passwordField
+			anchors.verticalCenter : parent.verticalCenter
+			anchors.horizontalCenter : parent.horizontalCenter
+			width: Dims.w(80)
+			height: Dims.h(15)
+			previewText: qsTrId("Password")
+			inputMethodHints: Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
+		}
 		HandWritingKeyboard {
 			anchors.fill: parent
 		}
@@ -160,11 +169,12 @@ Application {
 		id:savePage
 		Item{
 			id:rootM
-			TextField {
+			TextBox {
 				id: lockField
 				anchors.horizontalCenter : parent.horizontalCenter
 				anchors.verticalCenter : parent.verticalCenter
 				width: Dims.w(80)
+				height: Dims.h(15)
 				echoMode:TextInput.Password
 				inputMethodHints:Qt.ImhSensitiveData
 				previewText: qsTrId("Password")
@@ -194,7 +204,7 @@ Application {
        			id: codeLabel
          		textFormat: Text.RichText
          		anchors.centerIn: parent
-         		text: twofactor.getCode(database[i].secret).toString().padStart(6, '0')
+         		text: twofactor.getCode(database[i].secret).toString().padStart(database[i].digit, '0')
          		font.pixelSize: Dims.h(15) // originally 25
          		horizontalAlignment: Text.AlignHCenter
       		}
@@ -222,7 +232,7 @@ Application {
               	ctx.strokeStyle = Qt.rgba(1,1,1,0.5)
               	ctx.stroke()
               	if (fraction_of_circle === 0) { // update the code
-                   codeLabel.text = twofactor.getCode(database[i].secret).toString().padStart(6, '0')
+                   codeLabel.text = twofactor.getCode(database[i].secret).toString().padStart(database[i].digit, '0')
               	}
           	}
     	}
@@ -241,23 +251,26 @@ Application {
 
 	Component{
 		id:addPage
-		Item{
-			id:rootM
-			TextField {
+		Item {
+			id:rootM 
+			TextBox {
 				id: secretField
 				anchors.verticalCenter : parent.verticalCenter
 				anchors.horizontalCenter : parent.horizontalCenter
 				width: Dims.w(80)
+				height: Dims.h(15)
 				previewText: qsTrId("Shared secret")
 				inputMethodHints: Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
 			}
-			TextField {
+			TextBox {
 				id: issuerField
 				anchors.horizontalCenter : parent.horizontalCenter
 				anchors.bottom : secretField.top
 				anchors.bottomMargin: 10
 				width: Dims.w(80)
+				height:Dims.h(15)
 				previewText: qsTrId("Issuer name")
+				inputMethodHints: Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
 			}
 			
 			HandWritingKeyboard {
@@ -274,7 +287,7 @@ Application {
 					layerStack.pop(rootM)
  				}
 			}
-		}
+  		}
 	}
 	
 	Component {
@@ -304,7 +317,7 @@ Application {
 	}		
 	
 	Component {
-        id: menuPage
+		id: menuPage
 		Flickable {
             contentHeight: settingsColumn.implicitHeight
             contentWidth: width

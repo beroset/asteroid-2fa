@@ -12,6 +12,7 @@
 #include <string>
 #include <cstdlib>
 #include <crypt.h>
+#include <QDebug>
 
 using namespace std;
 
@@ -38,8 +39,6 @@ bool Vault::saveDatabase(QString password, QString db, int len){
 		keyObj["nonce"] = "";
 	}
 	
-	
-	
 	QJsonObject rootObj;
 	rootObj.insert("key",keyObj);
 	rootObj.insert("db",QString::fromStdString(data));
@@ -58,7 +57,6 @@ bool Vault::saveDatabase(QString password, QString db, int len){
 QString Vault::readDatabase(QString password) {
 	Crypt crypto;
 	QFile jsonFile("/home/ceres/database.json");
-	
  	jsonFile.open(QFile::ReadOnly);
 	QJsonDocument d = QJsonDocument::fromJson(jsonFile.readAll());
 	jsonFile.close();
@@ -82,8 +80,8 @@ QString Vault::readDatabase(QString password) {
 		data = hex2int(data);	
 		data = crypto.decrypt(data,passwd);
 	}
-	return readData(QString::fromStdString(data));
 	
+	return readData(QString::fromStdString(data));	
 }
 
 
@@ -93,10 +91,14 @@ QString Vault::readData(QString data){
 	data = "";
 	for(int i=0;i<db.count();++i){
 		QVariantMap o = db.at(i).toObject().toVariantMap();
+		QVariantMap e = o["info"].toMap();
 		data += o["issuer"].toString() + ":";
-		data += o["secret"].toString() + ";";
+		data += e["secret"].toString() + ":";
+		data += e["algo"].toString() + ":";
+		data += e["digit"].toString() + ":";
+		data += e["period"].toString() + ";";
 	}
-    
+   
 	return data;
 }
 
@@ -107,12 +109,21 @@ string Vault::saveData(QString data,int len){
 	for(int i=0;i<len;++i){
 		QJsonObject db;
 		QStringList tmp = list[i].split(":");
+		db.insert("type","totp");
+		db.insert("name","");
 		db.insert("issuer",tmp[0]);
-		db.insert("secret",tmp[1]);
-        database.append(db);
-    }
+		
+		QJsonObject info;
+		info.insert("secret",tmp[1]);
+		info.insert("algo", "SHA1");
+		info.insert("digit", 6);
+		info.insert("period", 30);
+		
+		db.insert("info",info);
+      database.append(db);
+	}
     
-    QJsonDocument jsonDoc(database);
+   QJsonDocument jsonDoc(database);
 	QString tmp = jsonDoc.toJson();
 	
 	return tmp.toUtf8().toStdString();
