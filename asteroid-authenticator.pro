@@ -1,5 +1,6 @@
 TARGET = asteroid-authenticator
-CONFIG += asteroidapp
+CONFIG += asteroidapp 
+CONFIG += qzxing_qml
 
 SOURCES +=	main.cpp \
 	arduinolibs/libraries/Crypto/Crypto.cpp \
@@ -17,10 +18,13 @@ SOURCES +=	main.cpp \
 	scrypt/warnp.c \
     libcppotp/bytes.cpp \
     libcppotp/otp.cpp \
-    libcppotp/sha1.cpp \ 
+    libcppotp/sha1.cpp \
+    qrcode/qrcodegen.cpp \
     twofactor.cpp \
     vault.cpp \
-    crypt.cpp 
+    crypt.cpp \
+    qrcode.cpp
+    
     
     
 
@@ -48,10 +52,13 @@ HEADERS += \
 	libcppotp/bytes.h \
     libcppotp/otp.h \
     libcppotp/sha1.h \
+    qrcode/qrcodegen.h \
     twofactor.h \
     vault.h \
-    crypt.h 
-    
+    crypt.h \
+    qrcode.h
+
+include(QZXing/QZXing.pri)    
     
 CONFIG += qmltypes
 QML_IMPORT_NAME = com.asteroidos.authenticator

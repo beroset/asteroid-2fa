@@ -16,16 +16,26 @@
  */
 
 #include <QQmlEngine>
+#include <QQmlApplicationEngine>
 #include <twofactor.h>
 #include <crypt.h>
 #include <vault.h>
+#include <qrcode.h>
+#include "QZXing.h"
 #include <asteroidapp.h>
+
 
 int main(int argc, char *argv[])
 {
+	QQmlApplicationEngine engine;
+
+	QZXing::registerQMLTypes();
+	QZXing::registerQMLImageProvider(engine);
+	
     qmlRegisterType<TwoFactor>("TwoFactor", 1, 0, "TwoFactor");
     qmlRegisterType<Vault>("Vault", 1, 0, "Vault");
     qmlRegisterType<Crypt>("Crypt", 1, 0, "Crypt");
+    qmlRegisterType<QRCode>("QRCode", 1, 0, "QRCode");
     return AsteroidApp::main(argc, argv);
 }
 

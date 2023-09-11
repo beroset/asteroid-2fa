@@ -25,6 +25,8 @@ import Nemo.Configuration 1.0
 import TwoFactor 1.0
 import Vault 1.0
 import Crypt 1.0
+import QRCode 1.0
+import QZXing 3.3
 import QtQuick.VirtualKeyboard 2.0
 import QtQuick.VirtualKeyboard.Settings 2.15
 Application {
@@ -37,6 +39,7 @@ Application {
  	property var db : ""
  	property var datasize : 0 
  	property var database:[]
+ 	property var s: 1-0.207
 
 	TwoFactor{
  		id:twofactor
@@ -44,10 +47,14 @@ Application {
  	Vault{
  		id:vault
  	}
+ 	
+ 	QRCode{
+		id:qrcode
+	}
  	Crypt{
  		id:crypt
  	}
-
+			
 	function readData() {
 	   	var list = db.split(";")
 	   	var len = list.length-1
@@ -109,7 +116,7 @@ Application {
 			anchors.verticalCenter : parent.verticalCenter
 			anchors.horizontalCenter : parent.horizontalCenter
 			width: Dims.w(80)
-			height: Dims.h(15)
+			height: 50
 			previewText: qsTrId("Password")
 			inputMethodHints: Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
 		}
@@ -283,7 +290,7 @@ Application {
  				anchors.bottomMargin: Dims.h(15)
  				iconName: "ios-checkmark-circle-outline"
  				onClicked: {
- 					addData(issuerField.text,secretField.text)
+ 					addData(issuerField.text,secretField.text,"SHA1","6","30")
 					layerStack.pop(rootM)
  				}
 			}
@@ -317,6 +324,57 @@ Application {
 	}		
 	
 	Component {
+		id:qrcodePage	
+		Item {
+		id:rootM
+		Rectangle {
+			anchors.verticalCenter:parent.verticalCenter
+        	anchors.horizontalCenter:parent.horizontalCenter
+        	width: parent.width
+        	height : parent.height
+			color:"black"
+			opacity:1.0
+		}
+		Image {
+			id: qrcodeImage
+			anchors.verticalCenter:parent.verticalCenter
+        	anchors.horizontalCenter:parent.horizontalCenter
+        	width: parent.width * 0.7
+        	height : parent.height * 0.7 
+            antialiasing: false
+        	opacity: 1.0
+        	mipmap:true
+         	source: "file:/home/ceres/export.jpeg"
+         	
+        
+        MouseArea {
+        	anchors.fill:parent
+        	onClicked: { 
+        		layerStack.pop(rootM) }
+    		}
+        }
+		
+		}
+	}
+	
+	Component {
+		id:exportPage	
+		Item {
+		id:rootM
+		IconButton {
+         	anchors.verticalCenter: parent.verticalCenter
+			anchors.horizontalCenter: parent.horizontalCenter
+			iconName: "ion-qr-code-outline"
+         	onClicked: {
+         		layerStack.push(qrcodePage)
+         		
+         	}
+		}
+		
+		}
+	}
+	
+	Component {
 		id: menuPage
 		Flickable {
             contentHeight: settingsColumn.implicitHeight
@@ -345,13 +403,22 @@ Application {
                     iconName: "ios-lock"
                     onClicked: layerStack.push(savePage)
                 }
-   				
+                ListItem {
+                    title: qsTrId("Export")
+                    iconName: "ion-qr-code-outline"
+                    onClicked: {
+                    	qrcode.generateQRCodeTest()
+                    	layerStack.push(qrcodePage)
+                    }
+                }
+                   				
 				Item { width: parent.width; height: Dims.h(10);visible: DeviceInfo.hasRoundScreen}
 
             }
         }
         
 	} 
+	
 	
 }	
  

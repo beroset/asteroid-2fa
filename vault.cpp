@@ -23,7 +23,7 @@ bool Vault::saveDatabase(QString password, QString db, int len){
     
     if (password != ""){
     	
-    	password = password.toUpper().toUtf8();
+    	password = password.toUpper();//.toUtf8();
     	password = QString::fromStdString(crypto.scrypt(password.toStdString()));
     	string passwd = crypto.generateKey(password.toStdString());
 		
@@ -44,11 +44,11 @@ bool Vault::saveDatabase(QString password, QString db, int len){
 	rootObj.insert("db",QString::fromStdString(data));
 	
 	QJsonDocument doc(rootObj);
-	QString jsonStr = doc.toJson();
+	QString jsonStr = doc.toJson(QJsonDocument::Indented);
 	
 	QFile sfile("/home/ceres/database.json");
 	if(sfile.open(QIODevice::WriteOnly)){
-		sfile.write(jsonStr.toUtf8());
+		sfile.write(jsonStr.toUtf8()); //.toUtf8()
 		sfile.close(); 
 	}
 	return true;
@@ -64,16 +64,16 @@ QString Vault::readDatabase(QString password) {
 	QVariantMap rootMap = root.toVariantMap();
 	
 	QVariantMap key = rootMap["key"].toMap();
-	crypto.setSalt(hex2int(key["salt"].toString().toUtf8().toStdString())); 
-	crypto.setTag(hex2int(key["tag"].toString().toUtf8().toStdString()));
-	crypto.setNonce(hex2int(key["nonce"].toString().toUtf8().toStdString()));
-	
+	crypto.setSalt(hex2int(key["salt"].toString().toStdString())); //.toUtf8() 
+	crypto.setTag(hex2int(key["tag"].toString().toStdString())); //.toUtf8()
+	crypto.setNonce(hex2int(key["nonce"].toString().toStdString())); //.toUtf8()
+
 	QString db = rootMap["db"].toString();
-	db = db.toUtf8();
+	db = db; //.toUtf8()
 	string data = db.toStdString();
 	
 	if (password != ""){
-    	password = password.toUpper().toUtf8();
+    	password = password.toUpper(); //.toUtf8();
     	password = QString::fromStdString(crypto.scrypt(password.toStdString()));
     	string passwd = crypto.generateKey(password.toStdString());
 		
@@ -86,7 +86,7 @@ QString Vault::readDatabase(QString password) {
 
 
 QString Vault::readData(QString data){
-	QJsonDocument d = QJsonDocument::fromJson(data.toLocal8Bit());
+	QJsonDocument d = QJsonDocument::fromJson(data.toLocal8Bit());//.toLocal8Bit()
 	QJsonArray db = d.array();
 	data = "";
 	for(int i=0;i<db.count();++i){
@@ -110,7 +110,6 @@ string Vault::saveData(QString data,int len){
 		QJsonObject db;
 		QStringList tmp = list[i].split(":");
 		db.insert("type","totp");
-		db.insert("name","");
 		db.insert("issuer",tmp[0]);
 		
 		QJsonObject info;
@@ -123,10 +122,11 @@ string Vault::saveData(QString data,int len){
       database.append(db);
 	}
     
-   QJsonDocument jsonDoc(database);
-	QString tmp = jsonDoc.toJson();
-	
-	return tmp.toUtf8().toStdString();
+   	QJsonDocument jsonDoc(database);
+	QString tmp = jsonDoc.toJson(QJsonDocument::Indented);
+	tmp = tmp.simplified();
+	//tmp = tmp.replace( " ", "" );
+	return tmp.toStdString();
 }
 
 
