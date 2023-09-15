@@ -40,6 +40,8 @@ Application {
  	property var datasize : 0 
  	property var database:[]
  	property var s: 1-0.207
+ 	property string getText
+ 	property string getText2
 
 	TwoFactor{
  		id:twofactor
@@ -102,42 +104,44 @@ Application {
  	LayerStack {
    	id: layerStack
 		firstPage: passwordPage
-
 	}
-
 	
 	Component {
 		id:passwordPage
 		Item{
 		id:rootM
-		
-		TextBox {
+			TextBox {
 			id: passwordField
-			anchors.verticalCenter : parent.verticalCenter
-			anchors.horizontalCenter : parent.horizontalCenter
-			width: Dims.w(80)
+			anchors.verticalCenter:parent.verticalCenter
+    		anchors.horizontalCenter:parent.horizontalCenter
+    		width: Dims.w(80)
 			height: 50
 			previewText: qsTrId("Password")
 			inputMethodHints: Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
+			text:getText
+			MouseArea {
+    			anchors.fill: parent
+    			onClicked: {
+    				getText = ""
+                	layerStack.push(keyboardPage);
+                }
+			}
 		}
-		HandWritingKeyboard {
-			anchors.fill: parent
-		}
-		
+       		
 		IconButton {
 			anchors.horizontalCenter: parent.horizontalCenter
         	anchors.bottom: parent.bottom
         	anchors.bottomMargin: Dims.h(15)
 			iconName: "ios-checkmark-circle-outline"
 			onClicked: { 
+				
  				db = vault.readDatabase(passwordField.text)
 				readData()
+				getText = ""
 				layerStack.push(issuerPage)
  			}
 		}
-		
-		}
-	
+	}
 	}
 
 	Component{	
@@ -185,11 +189,20 @@ Application {
 				echoMode:TextInput.Password
 				inputMethodHints:Qt.ImhSensitiveData
 				previewText: qsTrId("Password")
+				text: getText
+				MouseArea {
+       				anchors.fill: parent
+       				onClicked: { 
+       					getText = ""
+       					layerStack.push(keyboardPage) 
+       				}
+    			}
 			}
 
-			HandWritingKeyboard {
-				anchors.fill: parent
-			}
+			//HandWritingKeyboard {
+			//	anchors.fill: parent
+			//}
+			
 			IconButton {
  				anchors.bottom : parent.bottom
  				anchors.horizontalCenter : parent.horizontalCenter
@@ -198,6 +211,7 @@ Application {
  				onClicked: {
  					saveData()
  					vault.saveDatabase(lockField.text,db,datasize)
+ 					getText = ""
 					layerStack.pop(rootM)
  				}
 			}
@@ -267,7 +281,15 @@ Application {
 				width: Dims.w(80)
 				height: Dims.h(15)
 				previewText: qsTrId("Shared secret")
-				inputMethodHints: Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
+				inputMethodHints:Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
+				text:getText2
+				MouseArea {
+       				anchors.fill: parent
+       				onClicked: { 
+       					getText2 = ""
+       					layerStack.push(keyboard2Page, {inputMethodHints:Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly}) 
+       				}
+    			}
 			}
 			TextBox {
 				id: issuerField
@@ -278,11 +300,20 @@ Application {
 				height:Dims.h(15)
 				previewText: qsTrId("Issuer name")
 				inputMethodHints: Qt.ImhNumbersOnly | Qt.ImhUppercaseOnly
+				text:getText
+				MouseArea {
+       				anchors.fill: parent
+       				onClicked: { 
+       					getText=""
+       					layerStack.push(keyboardPage) 
+       					
+       				}
+    			}
 			}
 			
-			HandWritingKeyboard {
-				anchors.fill: parent
-			}
+			//HandWritingKeyboard {
+			//	anchors.fill: parent
+			//}
 	
 			IconButton {
  				anchors.bottom : parent.bottom
@@ -291,6 +322,8 @@ Application {
  				iconName: "ios-checkmark-circle-outline"
  				onClicked: {
  					addData(issuerField.text,secretField.text,"SHA1","6","30")
+ 					getText = ""
+ 					getText2 = ""
 					layerStack.pop(rootM)
  				}
 			}
@@ -374,6 +407,7 @@ Application {
 		}
 	}
 	
+	
 	Component {
 		id: menuPage
 		Flickable {
@@ -391,7 +425,11 @@ Application {
                 ListItem {
                     title: qsTrId("Add")
                     iconName: "ios-add-circle"
-                    onClicked: layerStack.push(addPage)
+                    onClicked: {
+                    	getText = ""
+                    	getText2 = ""
+                    	layerStack.push(addPage)
+                    }
                 }
                 ListItem {
                     title: qsTrId("Remove")
@@ -401,7 +439,10 @@ Application {
                 ListItem {
                     title: qsTrId("Save")
                     iconName: "ios-lock"
-                    onClicked: layerStack.push(savePage)
+                    onClicked: {
+                    	getText = ""
+                    	layerStack.push(savePage)
+                    }
                 }
                 ListItem {
                     title: qsTrId("Export")
@@ -417,9 +458,89 @@ Application {
             }
         }
         
-	} 
-	
-	
-}	
- 
+	}
 
+Component {
+	id:keyboardPage	
+	Item {
+		id:rootM
+		property alias inputMethodHints: txtField.inputMethodHints
+		property var pop
+					
+		TextField {
+    		id: txtField
+    		anchors.top:parent.top
+    		anchors.topMargin :40
+    		anchors.horizontalCenter:parent.horizontalCenter
+    	    width: Dims.w(80)
+    	    previewText: qsTrId("")
+   		}	
+	
+		InputPanel {
+    		id: kbd
+    	   	anchors {
+   		    	verticalCenter: parent.verticalCenter
+   		    	horizontalCenter: parent.horizontalCenter
+   			}
+   			width:parent.width * 0.90 //Dims.w(95)
+    	   	visible: active
+   		}
+		IconButton {
+			id:txtEnter
+			anchors.bottom : parent.bottom
+ 			anchors.horizontalCenter : parent.horizontalCenter		
+ 			iconName: "ios-checkmark-circle-outline"
+ 			onClicked: {
+				getText = txtField.text	
+				layerStack.pop(rootM)				
+			}
+		}
+		Component.onCompleted: {
+		VirtualKeyboardSettings.styleName = "watch"
+		
+   		}
+	}		
+}
+Component {
+	id:keyboard2Page	
+	Item {
+		id:rootM
+		property alias inputMethodHints: txtField.inputMethodHints
+		property var pop
+					
+		TextField {
+    		id: txtField
+    		anchors.top:parent.top
+    		anchors.topMargin :40
+    		anchors.horizontalCenter:parent.horizontalCenter
+    	    width: Dims.w(80)
+    	    previewText: qsTrId("")
+   		}	
+	
+		InputPanel {
+    		id: kbd
+    	   	anchors {
+   		    	verticalCenter: parent.verticalCenter
+   		    	horizontalCenter: parent.horizontalCenter
+   			}
+   			width:parent.width * 0.90 //Dims.w(95)
+    	   	visible: active
+   		}
+		IconButton {
+			id:txtEnter
+			anchors.bottom : parent.bottom
+ 			anchors.horizontalCenter : parent.horizontalCenter		
+ 			iconName: "ios-checkmark-circle-outline"
+ 			onClicked: {
+				getText2 = txtField.text	
+				layerStack.pop(rootM)				
+			}
+		}
+		Component.onCompleted: {
+		VirtualKeyboardSettings.styleName = "watch"
+		
+   		}
+	}		
+}
+
+}
