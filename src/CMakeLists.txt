@@ -56,10 +56,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         arduinolibs
         cpptotp
         qzxing
-    INTERFACE
         scrypt-kdf
+    INTERFACE
         qrcodegencpp
 )
 
 install(TARGETS ${CMAKE_PROJECT_NAME} arduinolibs cpptotp qzxing
-	DESTINATION ${CMAKE_INSTALL_LIBDIR})
+       DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(FILES "${scryptLinkDir}/libscrypt-kdf.so.1.0.0" TYPE LIB)
